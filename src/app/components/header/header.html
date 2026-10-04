@@ -1,0 +1,17 @@
+<header class="sticky top-0 z-50 border-b border-white/5 bg-bg/80 backdrop-blur">
+  <div class="page-container flex h-16 items-center gap-4">
+    <a
+      routerLink="/"
+      class="flex shrink-0 items-center gap-2 text-xl font-bold tracking-tight"
+      (click)="store.getPopularMovies()"
+    >
+      <span class="size-2.5 rounded-full bg-accent" aria-hidden="true"></span>
+      Movies
+    </a>
+    <app-search-bar
+      class="ml-auto min-w-0 flex-1 sm:max-w-md"
+      [query]="store.query()"
+      (search)="onSearch($event)"
+    />
+  </div>
+</header>

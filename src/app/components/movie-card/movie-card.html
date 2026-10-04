@@ -1,0 +1,83 @@
+@let m = movie();
+<!--
+  Compact poster that zooms in on hover / keyboard focus and reveals the title, rating, year and
+  overview. Hover styles apply only on devices that can hover; touch screens show the title below.
+  `z-index` transitions too, so a shrinking card stays above its neighbours until it is back in place.
+-->
+<a
+  [routerLink]="['/movie', m.id]"
+  class="group relative z-0 flex flex-col rounded-xl transition-[z-index] duration-300 outline-none hover:z-10 focus-visible:z-10"
+>
+  <!-- First in the DOM so screen readers start with the title; shown below the poster on touch.
+       `not-sr-only` resets margins, so the spacing lives on the inner heading. -->
+  <div class="order-last sr-only touch:not-sr-only">
+    <h3 class="mt-2 line-clamp-2 text-sm leading-snug font-semibold">{{ m.title }}</h3>
+  </div>
+
+  <div
+    data-testid="card-tile"
+    class="relative aspect-[2/3] origin-[var(--card-origin,center)] overflow-hidden rounded-xl bg-surface ring-accent transition duration-300 ease-out group-hover:-translate-y-2 group-hover:scale-130 group-hover:shadow-2xl group-hover:shadow-black/70 group-hover:ring-2 group-focus-visible:-translate-y-2 group-focus-visible:scale-130 group-focus-visible:shadow-2xl group-focus-visible:shadow-black/70 group-focus-visible:ring-2"
+  >
+    @if (m.posterPath; as poster) {
+      <img
+        [ngSrc]="poster"
+        alt=""
+        [sizes]="posterSizes"
+        [priority]="priority()"
+        fill
+        class="object-cover"
+      />
+    } @else {
+      <div
+        data-testid="poster-placeholder"
+        class="flex h-full flex-col items-center justify-center gap-2 p-4 text-center text-muted"
+      >
+        <svg
+          class="size-10"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          aria-hidden="true"
+        >
+          <rect x="3" y="4" width="18" height="16" rx="2" />
+          <path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4" />
+        </svg>
+        <span class="text-xs">No poster</span>
+      </div>
+    }
+
+    <div
+      data-testid="card-details"
+      class="absolute inset-x-0 bottom-0 flex max-h-full flex-col justify-end bg-linear-to-t from-bg via-bg/90 to-transparent p-3 pt-16 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+    >
+      <!-- The title is the `h3` above; this visual copy is hidden from screen readers. -->
+      <p class="line-clamp-2 text-sm leading-snug font-semibold" aria-hidden="true">
+        {{ m.title }}
+      </p>
+
+      @if (m.rating > 0 || year()) {
+        <p data-testid="card-meta" class="mt-1 flex items-center gap-2 text-xs text-muted">
+          @if (m.rating > 0) {
+            <span class="font-semibold text-text">
+              <span class="sr-only">Rating </span
+              ><span class="text-accent-text" aria-hidden="true">★ </span>{{ m.rating.toFixed(1) }}
+            </span>
+          }
+          @if (year(); as year) {
+            <span>{{ year }}</span>
+          }
+        </p>
+      }
+
+      @if (m.overview) {
+        <p
+          data-testid="card-overview"
+          class="mt-1.5 line-clamp-4 text-xs leading-snug text-text/80"
+        >
+          {{ m.overview }}
+        </p>
+      }
+    </div>
+  </div>
+</a>

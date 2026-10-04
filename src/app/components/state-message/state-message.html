@@ -1,0 +1,27 @@
+@switch (kind()) {
+  @case ('error') {
+    <div
+      role="alert"
+      class="flex flex-col items-center gap-4 rounded-xl bg-surface px-6 py-10 text-center"
+    >
+      <span class="text-3xl" aria-hidden="true">⚠</span>
+      <p class="font-semibold">{{ message() || 'Something went wrong. Please try again' }}</p>
+      <button
+        type="button"
+        class="rounded-lg bg-accent px-5 py-2 font-semibold transition hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-text focus-visible:outline-none"
+        (click)="retry.emit()"
+      >
+        Retry
+      </button>
+    </div>
+  }
+  @case ('empty') {
+    <div
+      role="status"
+      class="flex flex-col items-center gap-2 rounded-xl bg-surface px-6 py-10 text-center"
+    >
+      <span class="text-3xl" aria-hidden="true">🎬</span>
+      <p class="font-semibold">{{ message() || 'No movies found' }}</p>
+    </div>
+  }
+}

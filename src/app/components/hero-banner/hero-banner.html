@@ -1,0 +1,148 @@
+@let slides = movies();
+<section
+  class="group/hero relative w-full touch-pan-y overflow-hidden py-6 md:py-10"
+  aria-roledescription="carousel"
+  aria-label="Popular now"
+  (keydown.arrowleft)="prev()"
+  (keydown.arrowright)="next()"
+  (pointerenter)="onPointerEnter($event)"
+  (pointerleave)="onPointerLeave($event)"
+  (pointerdown)="onPointerDown($event)"
+  (pointerup)="onPointerUp($event)"
+  (pointercancel)="onPointerCancel()"
+  (focusin)="onFocusIn($event)"
+  (focusout)="onFocusOut($event)"
+>
+  <!-- All cards share one grid cell and are shifted by their offset from the active card.
+       Slide changes are announced only when they are not automatic. -->
+  <div
+    class="grid [--hero-gap:0.75rem] md:[--hero-gap:1.25rem]"
+    [attr.aria-live]="autoplay() && !paused() ? 'off' : 'polite'"
+  >
+    @for (m of slides; track m.id; let i = $index) {
+      @let offset = offsets()[i];
+      @let current = offset === 0;
+      @let peeking = offset === 1 || offset === -1;
+      <div
+        role="group"
+        aria-roledescription="slide"
+        data-testid="hero-slide"
+        [attr.data-offset]="offset"
+        [attr.aria-label]="i + 1 + ' of ' + slides.length + ': ' + m.title"
+        [attr.aria-hidden]="current ? null : 'true'"
+        class="relative isolate col-start-1 row-start-1 flex aspect-[3/4] w-[86%] items-end justify-self-center overflow-hidden rounded-2xl bg-surface shadow-2xl shadow-black/40 transition-[translate,opacity] duration-700 ease-out sm:aspect-video md:w-[72%] lg:w-[60%] xl:aspect-[2/1]"
+        [style.translate]="'calc(' + offset + ' * (100% + var(--hero-gap))) 0'"
+        [class.z-10]="current"
+        [class.opacity-0]="!current && !peeking"
+        [class.pointer-events-none]="!current && !peeking"
+        [class.cursor-pointer]="peeking"
+        (click)="peeking && goTo(i)"
+      >
+        @if (m.backdropPath && withImage().has(m.id)) {
+          <img
+            [ngSrc]="m.backdropPath"
+            alt=""
+            [sizes]="backdropSizes"
+            fill
+            [priority]="i === 0"
+            class="-z-10 object-cover object-[center_20%]"
+          />
+        }
+
+        <div
+          class="p-5 transition-opacity duration-500 sm:p-8 lg:p-10"
+          [class.opacity-0]="!current"
+          [attr.inert]="current ? null : ''"
+        >
+          <p class="text-xs font-semibold tracking-widest text-accent-text uppercase">
+            Popular now
+          </p>
+          <h2 class="mt-2 max-w-2xl text-2xl font-bold tracking-tight md:text-4xl">
+            {{ m.title }}
+          </h2>
+
+          <p class="mt-2 flex items-center gap-3 text-sm text-muted">
+            @if (m.rating > 0) {
+              <span class="font-semibold text-text">
+                <span class="text-accent-text" aria-hidden="true">★</span>
+                {{ m.rating.toFixed(1) }}
+              </span>
+            }
+            @if (year(m); as year) {
+              <span>{{ year }}</span>
+            }
+          </p>
+
+          @if (m.overview) {
+            <p class="mt-3 line-clamp-3 max-w-xl text-sm text-text/90 md:text-base">
+              {{ m.overview }}
+            </p>
+          }
+
+          <a
+            [routerLink]="['/movie', m.id]"
+            class="mt-5 inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 font-semibold transition hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-text focus-visible:outline-none md:px-6 md:py-3"
+          >
+            Details <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (slides.length > 1) {
+    <button
+      type="button"
+      data-testid="hero-prev"
+      aria-label="Previous slide"
+      class="absolute top-1/2 left-2 z-20 hidden size-12 -translate-y-1/2 items-center justify-center rounded-full bg-bg/70 text-2xl opacity-0 backdrop-blur transition group-hover/hero:opacity-100 hover:bg-accent focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-text focus-visible:outline-none sm:flex lg:left-6 touch:hidden"
+      (click)="prev()"
+    >
+      <span aria-hidden="true">‹</span>
+    </button>
+    <button
+      type="button"
+      data-testid="hero-next"
+      aria-label="Next slide"
+      class="absolute top-1/2 right-2 z-20 hidden size-12 -translate-y-1/2 items-center justify-center rounded-full bg-bg/70 text-2xl opacity-0 backdrop-blur transition group-hover/hero:opacity-100 hover:bg-accent focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-text focus-visible:outline-none sm:flex lg:right-6 touch:hidden"
+      (click)="next()"
+    >
+      <span aria-hidden="true">›</span>
+    </button>
+
+    <div class="mt-3 flex justify-center gap-1.5 md:mt-4">
+      @for (m of slides; track m.id; let i = $index) {
+        <button
+          type="button"
+          data-testid="hero-indicator"
+          class="group/dot py-2 focus-visible:outline-none"
+          [attr.aria-label]="'Go to slide ' + (i + 1) + ': ' + m.title"
+          [attr.aria-current]="i === active() || null"
+          (click)="goTo(i)"
+        >
+          @let current = i === active();
+          <span
+            class="relative block h-1 w-6 overflow-hidden rounded-full transition-colors group-focus-visible/dot:ring-2 group-focus-visible/dot:ring-text md:w-10"
+            [class]="
+              current
+                ? autoplay()
+                  ? 'bg-text/30'
+                  : 'bg-text'
+                : 'bg-text/30 group-hover/dot:bg-text/60'
+            "
+          >
+            @if (current && autoplay()) {
+              <span
+                data-testid="hero-progress"
+                class="hero-progress absolute inset-0 origin-left rounded-full bg-text"
+                [style.animation-duration.ms]="autoplayMs"
+                [style.animation-play-state]="paused() ? 'paused' : 'running'"
+                (animationend)="next()"
+              ></span>
+            }
+          </span>
+        </button>
+      }
+    </div>
+  }
+</section>

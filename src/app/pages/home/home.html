@@ -1,0 +1,57 @@
+@if (heroMovies().length) {
+  <app-hero-banner [movies]="heroMovies()" />
+} @else if (!store.isSearch() && store.loading() && !store.movies().length) {
+  <!-- Reserves the banner's space while popular movies load, so the grid does not jump. -->
+  <!-- Mirrors the carousel: a centred card with peeking neighbours, then the indicator row. -->
+  <div data-testid="hero-skeleton" class="overflow-hidden py-6 md:py-10" aria-hidden="true">
+    <div class="flex animate-pulse justify-center gap-3 md:gap-5">
+      @for (card of [0, 1, 2]; track card) {
+        <div
+          class="aspect-[3/4] w-[86%] shrink-0 rounded-2xl bg-surface sm:aspect-video md:w-[72%] lg:w-[60%] xl:aspect-[2/1]"
+          [class.opacity-50]="card !== 1"
+        ></div>
+      }
+    </div>
+    <div class="mt-3 h-5 md:mt-4"></div>
+  </div>
+}
+
+<section class="page-container py-8">
+  <h1 class="mb-6 text-2xl font-bold sm:text-3xl">
+    @if (store.isSearch()) {
+      Results for “{{ store.query() }}”
+    } @else {
+      Popular
+    }
+  </h1>
+
+  @let error = store.error();
+  @if (error && !store.movies().length) {
+    <app-state-message kind="error" [message]="error" (retry)="store.reload()" />
+  } @else if (store.isEmpty()) {
+    <app-state-message kind="empty" [message]="'No movies found for “' + store.query() + '”'" />
+  } @else {
+    <app-movie-list [movies]="store.movies()" [loading]="store.loading()" />
+
+    <div class="mt-10 flex justify-center">
+      @if (error) {
+        <!-- A next page failed: keep the loaded movies and offer a retry below them. -->
+        <app-state-message
+          class="w-full max-w-md"
+          kind="error"
+          [message]="error"
+          (retry)="store.reload()"
+        />
+      } @else if (store.hasMore()) {
+        <button
+          type="button"
+          class="rounded-lg bg-surface-2 px-6 py-2.5 font-semibold transition hover:bg-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none disabled:cursor-wait disabled:opacity-60 disabled:hover:bg-surface-2"
+          [disabled]="store.loading()"
+          (click)="store.loadMore()"
+        >
+          {{ store.loading() ? 'Loading…' : 'Load more' }}
+        </button>
+      }
+    </div>
+  }
+</section>

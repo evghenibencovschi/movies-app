@@ -1,0 +1,63 @@
+@import 'tailwindcss';
+
+/* Design tokens inspired by okko.tv: near-black background, slightly lighter surfaces, violet accent. */
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --color-bg: #0f0f14;
+  --color-surface: #1a1a22;
+  --color-surface-2: #24242e;
+  --color-text: #f5f5f7;
+  --color-muted: #9b9bab;
+  --color-accent: #7b3fe4;
+  --color-accent-hover: #8e57f0;
+  /* Accent for small text on dark backgrounds: 7:1 on `bg` (accent itself is below WCAG AA). */
+  --color-accent-text: #a78bfa;
+}
+
+/* Devices without hover (touch screens): `touch:hidden`, `touch:block`. */
+@custom-variant touch (@media (hover: none));
+
+/* Horizontal page container shared by header, footer and pages (full-bleed blocks skip it). */
+@utility page-container {
+  @apply mx-auto w-full max-w-screen-2xl px-4 sm:px-6 lg:px-10;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scrollbar-color: var(--color-surface-2) var(--color-bg);
+  }
+
+  body {
+    @apply bg-bg font-sans text-text antialiased;
+  }
+
+  /* Fallback focus ring for anything without its own `focus-visible:` utilities. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    @apply bg-accent text-text;
+  }
+
+  /* Long single-word titles must wrap instead of widening the page on 360px screens. */
+  h1,
+  h2,
+  h3 {
+    overflow-wrap: break-word;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

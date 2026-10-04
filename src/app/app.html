@@ -1,0 +1,21 @@
+<div class="flex min-h-dvh flex-col">
+  <app-header />
+
+  <!-- Clips zoomed-in cards horizontally without making `main` a scroll container. -->
+  <main class="flex-1 overflow-x-clip">
+    <router-outlet />
+  </main>
+
+  <footer class="border-t border-white/5 py-6 text-sm text-muted">
+    <div class="page-container">
+      Data provided by
+      <a
+        class="text-text underline-offset-4 hover:underline"
+        href="https://www.themoviedb.org/"
+        target="_blank"
+        rel="noopener"
+        >TMDb</a
+      >. This product uses the TMDB API but is not endorsed or certified by TMDB.
+    </div>
+  </footer>
+</div>

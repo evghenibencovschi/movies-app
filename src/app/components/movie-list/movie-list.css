@@ -1,0 +1,59 @@
+/*
+ * Hovered cards zoom from `--card-origin` (see movie-card): cards in the first and last column
+ * grow inwards, so they never leave the screen. Column counts follow the grid breakpoints:
+ * 2 → sm 3 → md 4 → lg 5 → xl 6. `li:nth-child(n)` resets the previous breakpoint.
+ */
+li:nth-child(2n + 1) {
+  --card-origin: left;
+}
+li:nth-child(2n) {
+  --card-origin: right;
+}
+
+@media (width >= 40rem) {
+  li:nth-child(n) {
+    --card-origin: center;
+  }
+  li:nth-child(3n + 1) {
+    --card-origin: left;
+  }
+  li:nth-child(3n) {
+    --card-origin: right;
+  }
+}
+
+@media (width >= 48rem) {
+  li:nth-child(n) {
+    --card-origin: center;
+  }
+  li:nth-child(4n + 1) {
+    --card-origin: left;
+  }
+  li:nth-child(4n) {
+    --card-origin: right;
+  }
+}
+
+@media (width >= 64rem) {
+  li:nth-child(n) {
+    --card-origin: center;
+  }
+  li:nth-child(5n + 1) {
+    --card-origin: left;
+  }
+  li:nth-child(5n) {
+    --card-origin: right;
+  }
+}
+
+@media (width >= 80rem) {
+  li:nth-child(n) {
+    --card-origin: center;
+  }
+  li:nth-child(6n + 1) {
+    --card-origin: left;
+  }
+  li:nth-child(6n) {
+    --card-origin: right;
+  }
+}
